@@ -38,77 +38,9 @@ Persistent settings that Scout reads on every startup. Defaults if file doesn't 
 }
 ```
 
-### `/scout settings` — Interactive Settings Menu
+### `/scout:settings` — Interactive Settings Menu
 
-When the user runs `/scout settings`, walk through each setting interactively using `AskUserQuestion`. Show one setting at a time with the current value highlighted.
-
-**Step 1: Quality profile**
-
-Use `AskUserQuestion` with these options:
-
-```
-SCOUT SETTINGS (1/3)
-
-Quality profile — controls which model each agent uses
-
-Current: balanced
-
-Options:
-  high     — opus everywhere (best quality, highest cost)
-  balanced — opus for thinking, sonnet for execution (recommended)
-  budget   — sonnet everywhere (fastest, lowest cost)
-```
-
-Options: `["high", "balanced (current)", "budget"]` (mark whichever is current)
-
-**Step 2: Mode**
-
-```
-SCOUT SETTINGS (2/3)
-
-Execution mode — controls how much human interaction is required
-
-Current: interactive
-
-Options:
-  interactive — approval gates at every phase transition
-  yolo        — grill runs normally, then everything auto-executes
-  auto        — fully autonomous, skips grill entirely
-```
-
-Options: `["interactive", "yolo (current)", "auto"]` (mark whichever is current)
-
-**Step 3: cmux**
-
-```
-SCOUT SETTINGS (3/3)
-
-cmux tab spawning — controls whether agents get their own terminal tabs
-
-Current: auto
-
-Options:
-  auto — detect cmux on startup, use tabs if available
-  on   — always spawn cmux tabs (fails if cmux not running)
-  off  — always run in-process, no tabs
-```
-
-Options: `["auto", "on (current)", "off"]` (mark whichever is current)
-
-**Step 4: Confirm**
-
-Display the final settings:
-
-```
-Settings updated:
-  Quality: balanced → high
-  Mode: interactive → yolo
-  cmux: auto (unchanged)
-
-Saved to /tmp/scout-settings.json
-```
-
-Write the updated settings to `/tmp/scout-settings.json`.
+Use `/scout:settings` to configure settings interactively. This is a separate sub-skill for fast invocation — see `settings.md`.
 
 ### Quality Profiles
 
@@ -156,9 +88,8 @@ Read `/tmp/scout-settings.json` if it exists, otherwise use defaults.
 Check for mode overrides in the user's prompt:
 - `--auto` or "autonomously" → override mode to `auto`
 - `--yolo` or "yolo mode" → override mode to `yolo`
-- `settings` → open settings menu instead of starting pipeline
 
-If `settings` detected, run the interactive settings menu and stop (don't start the pipeline).
+For settings, use `/scout:settings` directly (separate sub-skill for fast invocation).
 
 ### 2. Detect cmux
 
