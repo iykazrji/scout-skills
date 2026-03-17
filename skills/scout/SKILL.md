@@ -8,10 +8,10 @@ description: End-to-end feature orchestrator — grills the user on their idea, 
 Takes a raw idea and drives it through interrogation, PRD creation, issue breakdown, and parallel execution — producing verified PRs. Manages a roster of named, color-coded agents.
 
 ## When to Use
-- User says "/scout" or "scout this"
+- User says "/scout" or "scout this" — starts the pipeline with a prompt
+- `/scout settings` — opens interactive settings menu
+- `/scout --auto` or `/scout --yolo` — starts with that mode override
 - User has an idea and wants to go from concept to shipped code
-- User wants the full product development pipeline
-- With `--auto` flag for autonomous execution
 
 ## Agent Roster
 
@@ -24,13 +24,141 @@ Takes a raw idea and drives it through interrogation, PRD creation, issue breakd
 | **Slicer** | Purple | `#7C3AED` | 🟣 | Breaks PRD into issues via `/prd-to-issues` | Yes (cmux only) |
 | **Builder-N** | Green | `#16A34A` | 🟢 | Executes issues — one per parallel issue | Yes (cmux only) |
 
+## Settings
+
+### Settings file: `/tmp/scout-settings.json`
+
+Persistent settings that Scout reads on every startup. Defaults if file doesn't exist:
+
+```json
+{
+  "quality": "balanced",
+  "mode": "interactive",
+  "cmux": "auto"
+}
+```
+
+### `/scout settings` — Interactive Settings Menu
+
+When the user runs `/scout settings`, walk through each setting interactively using `AskUserQuestion`. Show one setting at a time with the current value highlighted.
+
+**Step 1: Quality profile**
+
+Use `AskUserQuestion` with these options:
+
+```
+SCOUT SETTINGS (1/3)
+
+Quality profile — controls which model each agent uses
+
+Current: balanced
+
+Options:
+  high     — opus everywhere (best quality, highest cost)
+  balanced — opus for thinking, sonnet for execution (recommended)
+  budget   — sonnet everywhere (fastest, lowest cost)
+```
+
+Options: `["high", "balanced (current)", "budget"]` (mark whichever is current)
+
+**Step 2: Mode**
+
+```
+SCOUT SETTINGS (2/3)
+
+Execution mode — controls how much human interaction is required
+
+Current: interactive
+
+Options:
+  interactive — approval gates at every phase transition
+  yolo        — grill runs normally, then everything auto-executes
+  auto        — fully autonomous, skips grill entirely
+```
+
+Options: `["interactive", "yolo (current)", "auto"]` (mark whichever is current)
+
+**Step 3: cmux**
+
+```
+SCOUT SETTINGS (3/3)
+
+cmux tab spawning — controls whether agents get their own terminal tabs
+
+Current: auto
+
+Options:
+  auto — detect cmux on startup, use tabs if available
+  on   — always spawn cmux tabs (fails if cmux not running)
+  off  — always run in-process, no tabs
+```
+
+Options: `["auto", "on (current)", "off"]` (mark whichever is current)
+
+**Step 4: Confirm**
+
+Display the final settings:
+
+```
+Settings updated:
+  Quality: balanced → high
+  Mode: interactive → yolo
+  cmux: auto (unchanged)
+
+Saved to /tmp/scout-settings.json
+```
+
+Write the updated settings to `/tmp/scout-settings.json`.
+
+### Quality Profiles
+
+Each profile maps agents to models via the Agent tool's `model` parameter:
+
+| Agent | `high` | `balanced` | `budget` |
+|-------|--------|------------|----------|
+| **Scout** | opus | opus | sonnet |
+| **Griller** | opus | opus | sonnet |
+| **Reconn** | opus | sonnet | sonnet |
+| **Architect** | opus | opus | sonnet |
+| **Slicer** | opus | sonnet | sonnet |
+| **Builder-N** | opus | sonnet | sonnet |
+
+When dispatching an agent via the Agent tool, pass the `model` parameter:
+```
+Agent tool call:
+  model: "sonnet"  (or "opus" based on quality profile)
+  subagent_type: "general-purpose"
+  prompt: <agent task prompt>
+```
+
+### Execution Modes
+
+| Behavior | `interactive` | `yolo` | `auto` |
+|----------|--------------|--------|--------|
+| Grill interview | Yes | Yes | Skipped |
+| Grill approval gate | Yes | **Last checkpoint** — after this, hands-off | Skipped |
+| PRD approval | Yes | Auto-approved | Auto-approved |
+| Issue breakdown approval | Yes | Auto-approved | Auto-approved |
+| HITL issues | Pause for user | Pause for user | Treated as AFK |
+| Wave approval | Yes | Auto-approved | Auto-approved |
+| Phase transition reports | Wait for input | Report status, continue | Report status, continue |
+
+**`yolo` mode** is the sweet spot: you still get to shape the design through the grill, approve the decision summary, then Scout takes over and builds everything without further interruption. HITL issues still pause because they genuinely need human judgment.
+
 ## Startup Protocol
 
 On `/scout` invocation:
 
-### 1. Parse arguments
+### 1. Parse arguments and load settings
 
-Check for `--auto` flag in the user's prompt. If present or user says "autonomously" / "auto mode", set auto mode.
+Read `/tmp/scout-settings.json` if it exists, otherwise use defaults.
+
+Check for mode overrides in the user's prompt:
+- `--auto` or "autonomously" → override mode to `auto`
+- `--yolo` or "yolo mode" → override mode to `yolo`
+- `settings` → open settings menu instead of starting pipeline
+
+If `settings` detected, run the interactive settings menu and stop (don't start the pipeline).
 
 ### 2. Detect cmux
 
@@ -198,7 +326,10 @@ Save the Decision Summary to /tmp/scout-grill-summary.md when complete.
 Present the Decision Summary. Ask:
 > "Are you happy with these decisions? Should we proceed to writing the PRD, or revisit any points?"
 
-**Auto mode**: skip gate, proceed immediately.
+**Mode behavior:**
+- `interactive`: wait for explicit approval
+- `yolo`: wait for approval — **this is the last human checkpoint before full autonomy**
+- `auto`: skip gate (grill was already skipped)
 
 Update state: `phase: "PRD"`, `grillSummary: "/tmp/scout-grill-summary.md"`.
 
@@ -255,13 +386,16 @@ When done, write the issue number to /tmp/scout-result-architect.json:
 {"status": "done", "prdIssue": <number>}
 ```
 
-**Auto mode**: Add "Auto-approve the PRD without user confirmation. Create the GitHub issue immediately."
+**`yolo` or `auto` mode**: Add "Auto-approve the PRD without user confirmation. Create the GitHub issue immediately."
 
 ### 2c. Approval gate
 
 Confirm with user: "PRD created as issue #X. Ready to break it into implementation issues?"
 
-**Auto mode**: skip gate.
+**Mode behavior:**
+- `interactive`: wait for explicit approval
+- `yolo`: skip gate — auto-approved after grill
+- `auto`: skip gate
 
 Update state: `phase: "ISSUES"`, `prdIssue: <number>`.
 
@@ -290,13 +424,16 @@ When done, write to /tmp/scout-result-slicer.json:
 {"status": "done", "issues": [<list of issue numbers>]}
 ```
 
-**Auto mode**: Add "Auto-approve the breakdown without user confirmation. Create issues immediately."
+**`yolo` or `auto` mode**: Add "Auto-approve the breakdown without user confirmation. Create issues immediately."
 
 ### 3b. Approval gate
 
 Confirm: "Created issues #A, #B, #C, #D. Ready to start executing them?"
 
-**Auto mode**: skip gate.
+**Mode behavior:**
+- `interactive`: wait for explicit approval
+- `yolo`: skip gate — auto-approved after grill
+- `auto`: skip gate
 
 Update state: `phase: "EXECUTE"`, `issues: [<numbers>]`.
 
@@ -382,21 +519,23 @@ All PRs are created and verified. Review and merge in wave order.
 
 Update state: `phase: "DONE"`.
 
-## Auto Mode
+## Execution Modes (detailed)
 
-Invoked via `/scout --auto` or when user says "scout this autonomously".
+Mode is set via `/scout settings`, or overridden per-run with `--yolo` or `--auto`.
 
-| Behavior | Normal | Auto |
-|----------|--------|------|
-| Grill interview | Interactive Q&A | Skipped — Reconn produces Synthetic Decision Document |
-| Reconn research | Standard | Extended (auto-extended mode) |
-| PRD approval | User confirms | Auto-approved |
-| Issue breakdown | User confirms | Auto-approved |
-| HITL issues | Pause for user | Treated as AFK |
-| Phase transitions | Wait for input | Report status, continue immediately |
-| User interrupt | N/A | User can interrupt anytime to take control |
+### `interactive` (default)
 
-**Vague prompt guard**: If the user's prompt is < 2 sentences in auto mode, ask 2-3 clarifying questions before proceeding — even in auto mode, garbage-in produces garbage-out.
+Full human-in-the-loop. Every phase transition requires explicit approval. Best for learning the system or high-stakes features.
+
+### `yolo`
+
+**"Shape it, then ship it."** The grill runs normally — you shape the design, resolve decisions, approve the summary. After that, Scout takes over completely: writes the PRD, creates issues, and executes them all without further input. HITL issues still pause because they genuinely need human judgment.
+
+### `auto`
+
+Fully autonomous. Skips the grill entirely. Reconn runs in `auto-extended` mode to produce a Synthetic Decision Document. Everything is auto-approved. Only pauses on actual errors.
+
+**Vague prompt guard**: If the user's prompt is < 2 sentences in `auto` or `yolo` mode, ask 2-3 clarifying questions before proceeding — garbage-in produces garbage-out.
 
 ## State Tracking
 
@@ -424,9 +563,10 @@ Show at every phase transition:
 
 ```
 SCOUT STATE:
-  Mode: [cmux: active | cmux: off]
+  Mode: [interactive | yolo | auto]
+  Quality: [high | balanced | budget]
+  cmux: [active | off]
   Phase: [GRILL | PRD | ISSUES | EXECUTE | DONE]
-  Auto: [yes | no]
   Idea: <one-line summary>
   Grill Summary: <file path or "pending">
   PRD Issue: <GitHub issue number or "pending">
