@@ -133,7 +133,9 @@ In `yolo` mode, Bursar auto-proceeds unless the estimate exceeds $10. In `auto` 
 
 ## Skills Included
 
-Everything Scout needs is bundled in this repo — no external dependencies.
+Everything Scout needs is bundled in this repo — zero external dependencies. All 16 skills install together, and each works standalone outside of Scout too.
+
+### Core Skills (the pipeline)
 
 | Skill | Command | Used By | Description |
 |-------|---------|---------|-------------|
@@ -144,6 +146,22 @@ Everything Scout needs is bundled in this repo — no external dependencies.
 | **Write a PRD** | `/write-a-prd` | Architect agent | PRD writing and GitHub issue creation |
 | **PRD to Issues** | `/prd-to-issues` | Slicer agent | Vertical-slice issue breakdown |
 | **UI Designer** | `/ui-designer` | Designer agent | UI design specs and mockups for UI-heavy PRDs |
+| **Agent Device** | `/agent-device` | Inspector / Builders | On-device interaction — screenshots, taps, visual verification |
+
+### Knowledge Skills (framework best practices)
+
+These get injected into agent prompts when Scout detects the matching technology. They also work standalone for code review, refactoring, or general guidance.
+
+| Skill | Command | Activates When | Description |
+|-------|---------|----------------|-------------|
+| **Senior Architect** | `/senior-architect` | All projects | System design, module boundaries, architecture patterns |
+| **Flutter Expert** | `/flutter-expert` | Flutter detected | Dart 3, state management, widget patterns, Impeller |
+| **React Native** | `/react-native-best-practices` | RN detected | FPS, TTI, Hermes, bridge optimization, native modules |
+| **RN Animations** | `/rn-animations-performance` | Reanimated detected | Worklets, gesture handlers, shared values, 60fps patterns |
+| **React Native Skia** | `/using-react-native-skia` | Skia detected | SKSL shaders, canvas rendering, PixelRatio handling |
+| **React Best Practices** | `/react-best-practices` | React / Next.js detected | Server Components, data fetching, Core Web Vitals |
+| **Express.js** | `/expressjs-best-practices` | Express detected | Middleware, error handling, security, Supertest |
+| **Fastify** | `/fastify-best-practices` | Fastify detected | Plugin architecture, Typebox schemas, serialization |
 
 ## Docs
 
