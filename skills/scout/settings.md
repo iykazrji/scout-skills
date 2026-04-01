@@ -9,9 +9,9 @@ Opens an interactive settings menu for configuring Scout's behavior.
 
 ## On Invocation
 
-1. Read `/tmp/scout-settings.json`. If it doesn't exist, use defaults: `{"quality":"balanced","mode":"interactive","cmux":"auto"}`
+1. Read `~/.claude/skills/scout/settings.json`. If it doesn't exist, use defaults: `{"quality":"balanced","mode":"interactive","cmux":"auto"}`
 2. Walk through each setting using `AskUserQuestion`, one at a time
-3. Save updated settings to `/tmp/scout-settings.json`
+3. Save updated settings to `~/.claude/skills/scout/settings.json`
 
 ## Step 1: Quality Profile
 
@@ -76,16 +76,16 @@ Options (mark current with `(current)`):
 
 ## Step 4: Save and Confirm
 
-Write the updated settings to `/tmp/scout-settings.json`:
+Write the updated settings to `~/.claude/skills/scout/settings.json`:
 
 ```bash
-echo '{"quality":"<value>","mode":"<value>","cmux":"<value>"}' > /tmp/scout-settings.json
+echo '{"quality":"<value>","mode":"<value>","cmux":"<value>"}' > ~/.claude/skills/scout/settings.json
 ```
 
 Display the summary showing what changed:
 
 ```
-Settings saved to /tmp/scout-settings.json
+Settings saved to ~/.claude/skills/scout/settings.json
 
   Quality: balanced → high
   Mode: interactive → yolo
