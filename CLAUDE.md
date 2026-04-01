@@ -2,81 +2,66 @@
 
 ## Repo Location
 
-Canonical location: `~/.claude/skills/scout-skills/`
+`~/.claude/skills/scout/` — this is both the git repo and the skill directory. No symlinks needed.
 
-All skills are symlinked from `~/.claude/skills/<name>` into this repo — edits through the symlinks write directly here.
+## Structure
+
+```
+~/.claude/skills/scout/
+├── SKILL.md                 ← main /scout orchestrator
+├── settings.md              ← /scout:settings sub-skill
+├── settings.json            ← user config (gitignored)
+├── overview.html            ← visual overview page
+├── CLAUDE.md                ← you are here
+├── README.md                ← public docs
+├── .gitignore
+├── docs/
+│   ├── DESIGN.md
+│   └── scout-overview.html
+├── reconn/SKILL.md          ← /scout:reconn
+├── execute-issues/SKILL.md  ← /scout:execute-issues
+├── grill-me/SKILL.md        ← /scout:grill-me
+├── write-a-prd/SKILL.md     ← /scout:write-a-prd
+├── prd-to-issues/SKILL.md   ← /scout:prd-to-issues
+├── ui-designer/             ← /scout:ui-designer
+├── agent-device/            ← /scout:agent-device
+├── senior-architect/        ← /scout:senior-architect
+├── flutter-expert/          ← /scout:flutter-expert
+├── react-native-best-practices/
+├── rn-animations-performance/
+├── using-react-native-skia/
+├── react-best-practices/
+├── expressjs-best-practices/
+└── fastify-best-practices/
+```
+
+## Invocation
+
+- `/scout` — runs the main orchestrator (SKILL.md at repo root)
+- `/scout:reconn` — runs the reconn sub-skill
+- `/scout:settings` — opens settings menu
+- `/scout:grill-me`, `/scout:write-a-prd`, etc.
 
 ## Adding a New Skill
 
-1. Create the skill directory in the repo:
-   ```
-   skills/<new-skill-name>/SKILL.md
-   ```
-2. Symlink it into Claude Code:
+1. Create the directory: `~/.claude/skills/scout/<new-skill>/SKILL.md`
+2. Commit and push:
    ```bash
-   ln -sf "$(pwd)/skills/<new-skill-name>" ~/.claude/skills/<new-skill-name>
+   cd ~/.claude/skills/scout
+   git add <new-skill> && git commit -m "feat: add <new-skill>" && git push origin main
    ```
-3. Commit and push from the repo.
+3. It's immediately available as `/scout:<new-skill>`
 
-## Editing Existing Skills
+## Editing Skills
 
-Edit via the symlinks at `~/.claude/skills/<name>/` or directly in the repo at `skills/<name>/`. Both point to the same files.
-
-After editing, commit from the repo:
+Edit files directly — they're real files, not symlinks. Commit from the repo:
 ```bash
-cd ~/.claude/skills/scout-skills
+cd ~/.claude/skills/scout
 git add -A && git commit -m "description" && git push origin main
 ```
 
-## Important Conventions
+## Conventions
 
-- **Never move the repo** — 16 symlinks in `~/.claude/skills/` will break silently.
-- **`settings.json` is gitignored** — these are user-specific runtime config files (quality profile, execution mode). They live in the skill directories but are not committed.
-- **Don't copy files into `~/.claude/skills/<name>/`** — always work through the symlinks. Copying creates a real directory that shadows the symlink and causes divergence.
-- **Check `git status` periodically** — catch untracked runtime files before they get committed accidentally.
-- **Knowledge skills are bundled but independent** — skills like `/react-best-practices` or `/flutter-expert` work standalone outside Scout. If one needs independent versioning later, extract it to its own repo and replace with a symlink.
-
-## Repo Structure
-
-```
-scout-skills/
-├── CLAUDE.md              ← you are here
-├── README.md              ← public-facing docs, install guide
-├── .gitignore             ← excludes settings.json
-├── docs/
-│   ├── DESIGN.md          ← architecture and design decisions
-│   └── scout-overview.html ← visual HTML overview page
-└── skills/
-    ├── scout/             ← orchestrator (core)
-    ├── reconn/            ← research agent (core)
-    ├── execute-issues/    ← builder orchestrator (core)
-    ├── grill-me/          ← interrogation protocol (core)
-    ├── write-a-prd/       ← PRD writer (core)
-    ├── prd-to-issues/     ← issue breakdown (core)
-    ├── ui-designer/       ← design orchestrator (core)
-    ├── agent-device/      ← on-device interaction (core)
-    ├── senior-architect/  ← system design (knowledge)
-    ├── flutter-expert/    ← Flutter best practices (knowledge)
-    ├── react-native-best-practices/  (knowledge)
-    ├── rn-animations-performance/    (knowledge)
-    ├── using-react-native-skia/      (knowledge)
-    ├── react-best-practices/         (knowledge)
-    ├── expressjs-best-practices/     (knowledge)
-    └── fastify-best-practices/       (knowledge)
-```
-
-## Symlink Health Check
-
-Verify all symlinks are intact:
-```bash
-for skill in scout reconn execute-issues grill-me write-a-prd prd-to-issues ui-designer agent-device senior-architect flutter-expert react-native-best-practices rn-animations-performance using-react-native-skia react-best-practices expressjs-best-practices fastify-best-practices; do
-  target="$HOME/.claude/skills/$skill"
-  if [ -L "$target" ]; then
-    echo "OK: $skill"
-  elif [ -d "$target" ]; then
-    echo "WARN: $skill is a real directory, not a symlink"
-  else
-    echo "MISSING: $skill"
-  fi
-done
-```
+- **`settings.json` is gitignored** — user-specific runtime config (quality profile, execution mode).
+- **Check `git status` periodically** — catch untracked runtime files before they get committed.
+- **Knowledge skills are bundled but independent** — sub-skills like `/scout:react-best-practices` work standalone for code review, refactoring, or general guidance.
