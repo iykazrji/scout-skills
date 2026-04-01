@@ -18,12 +18,12 @@ Takes a raw idea and drives it through interrogation, PRD creation, issue breakd
 | Agent | Color | Hex | Icon | Role | Own Tab? |
 |-------|-------|-----|------|------|----------|
 | **Scout** | Orange | `#FF8C00` | 🟠 | Orchestrator — manages phases, state, handoffs, user interaction | Original tab |
-| **Griller** | Red | `#DC2626` | 🔴 | Interviews user via `/grill-me` protocol | No — runs in Scout tab |
+| **Griller** | Red | `#DC2626` | 🔴 | Interviews user via `/scout:grill-me` protocol | No — runs in Scout tab |
 | **Reconn** | Yellow | `#EAB308` | 🟡 | Deep research — codebase, web, QMD, claude-mem | Yes (cmux only) |
-| **Architect** | Blue | `#2563EB` | 🔵 | Writes PRD via `/write-a-prd` | Yes (cmux only) |
-| **Slicer** | Purple | `#7C3AED` | 🟣 | Breaks PRD into issues via `/prd-to-issues` | Yes (cmux only) |
+| **Architect** | Blue | `#2563EB` | 🔵 | Writes PRD via `/scout:write-a-prd` | Yes (cmux only) |
+| **Slicer** | Purple | `#7C3AED` | 🟣 | Breaks PRD into issues via `/scout:prd-to-issues` | Yes (cmux only) |
 | **Builder-N** | Green | `#16A34A` | 🟢 | Executes issues — one per parallel issue | Yes (cmux only) |
-| **Designer** | Pink | `#EC4899` | 🩷 | UI design orchestrator — dispatched for UI-heavy PRDs via `/ui-designer` | Yes (cmux only) |
+| **Designer** | Pink | `#EC4899` | 🩷 | UI design orchestrator — dispatched for UI-heavy PRDs via `/scout:ui-designer` | Yes (cmux only) |
 | **Bursar** | Amber | `#F59E0B` | 💰 | Token cost estimator — estimates implementation spend after PRD, presents budget options | No — runs in Scout tab |
 
 ## Settings
@@ -155,12 +155,12 @@ Note: Express and Fastify are backend frameworks — they can co-exist with fron
 
 Announce detected technology:
 ```
-SCOUT [flutter: yes] — using /flutter-expert + /senior-architect for Flutter-aware agents
-SCOUT [react-native: yes, expo: yes] — using /react-native-best-practices + /senior-architect + Expo skills
-SCOUT [nextjs: yes] — using /react-best-practices + /senior-architect for Next.js-aware agents
-SCOUT [react: yes] — using /react-best-practices + /senior-architect for React-aware agents
-SCOUT [express: yes] — using /expressjs-best-practices + /senior-architect for Express-aware agents
-SCOUT [fastify: yes] — using /fastify-best-practices + /senior-architect for Fastify-aware agents
+SCOUT [flutter: yes] — using /scout:flutter-expert + /scout:senior-architect for Flutter-aware agents
+SCOUT [react-native: yes, expo: yes] — using /scout:react-native-best-practices + /scout:senior-architect + Expo skills
+SCOUT [nextjs: yes] — using /scout:react-best-practices + /scout:senior-architect for Next.js-aware agents
+SCOUT [react: yes] — using /scout:react-best-practices + /scout:senior-architect for React-aware agents
+SCOUT [express: yes] — using /scout:expressjs-best-practices + /scout:senior-architect for Express-aware agents
+SCOUT [fastify: yes] — using /scout:fastify-best-practices + /scout:senior-architect for Fastify-aware agents
 ```
 
 ### 3. Detect cmux
@@ -287,7 +287,7 @@ You are Reconn 🟡, a deep research agent. Research the following topic across 
 
 Topic: <user's idea — what parts of the codebase are relevant?>
 
-Follow the /reconn research protocol:
+Follow the /scout:reconn research protocol:
 1. Search the codebase for relevant files, patterns, conventions (Grep, Glob, Read)
 2. Search the web for relevant docs, APIs, best practices (WebSearch, WebFetch)
 3. Search notes for prior decisions (QMD search, claude-mem search)
@@ -321,7 +321,7 @@ You are Griller 🔴, a relentless technical interviewer. Your job is to interro
 
 ## Interview Protocol
 
-Follow the /grill-me protocol:
+Follow the /scout:grill-me protocol:
 - Use the Decision Tree Method (identify decision, ask WHY, probe alternatives, find edges, resolve or flag)
 - Work through categories: goals & constraints, architecture, data flow, error cases, scale, dependencies, sequencing, unknowns
 - Ask 1-3 focused questions per turn via AskUserQuestion
@@ -381,7 +381,7 @@ Codebase Research: <contents of /tmp/scout-reconn-prd-validation.md>
 
 ## Instructions
 
-Follow the /write-a-prd protocol with these adjustments:
+Follow the /scout:write-a-prd protocol with these adjustments:
 - SKIP Step 1 (gathering description) — already have it above
 - RUN Step 2 (explore repo) — validate against real code
 - SKIP Step 3 (grill) — already done, decisions are above
@@ -518,7 +518,7 @@ After PRD is created, scan the PRD content for UI-heavy indicators:
 - Frontend implementation tasks that would benefit from a design system
 
 If UI-heavy:
-1. Write context file to `/tmp/ui-designer-context.json`:
+1. Write context file to `/tmp/scout:ui-designer-context.json`:
 ```json
 {
   "source": "scout",
@@ -541,7 +541,7 @@ If UI-heavy:
 - `yolo`: auto-dispatch Designer in express mode
 - `auto`: auto-dispatch Designer in auto mode
 
-Update state: `designerUsed: true`, `designerState: "/tmp/ui-designer-state.json"`.
+Update state: `designerUsed: true`, `designerState: "/tmp/scout:ui-designer-state.json"`.
 
 ## Phase 3: ISSUES — Break PRD into Vertical Slices
 
@@ -555,7 +555,7 @@ You are Slicer 🟣, an issue planner. Break a PRD into vertical slice GitHub is
 
 PRD Issue: #<number>
 
-Follow the /prd-to-issues protocol:
+Follow the /scout:prd-to-issues protocol:
 1. Fetch the PRD with `gh issue view <number>`
 2. Explore the codebase if needed
 3. Draft vertical slices (tracer bullets — thin end-to-end paths, not horizontal layers)
@@ -588,9 +588,9 @@ Display updated SCOUT STATE.
 
 **Goal**: Implement every issue, create verified PRs, close the loop.
 
-### 4a. Dispatch to /execute-issues
+### 4a. Dispatch to /scout:execute-issues
 
-Pass the issue list to the `/execute-issues` skill. The skill handles:
+Pass the issue list to the `/scout:execute-issues` skill. The skill handles:
 - Fetching and triaging issues
 - Building wave-based execution plan
 - User confirmation (or auto-approve in auto mode)
@@ -651,8 +651,8 @@ PREOF
 
 If `designerUsed: true` in Scout state, run post-build visual verification after all Builders complete:
 
-1. Invoke `/ui-designer verify` — dispatches Inspector to compare builds against design mockups
-2. Inspector uses `/agent-device` for all on-device interaction: launching the app, navigating to screens, capturing screenshots. Use `rn-debugger` only if React component state inspection is needed.
+1. Invoke `/scout:ui-designer verify` — dispatches Inspector to compare builds against design mockups
+2. Inspector uses `/scout:agent-device` for all on-device interaction: launching the app, navigating to screens, capturing screenshots. Use `rn-debugger` only if React component state inspection is needed.
 3. If any screens FAIL: re-dispatch relevant Builders with specific fix instructions from the Inspector report
 4. If all screens PASS: proceed to completion
 
@@ -806,10 +806,10 @@ When `flutter: true`, inject the following into agent task prompts:
 ```
 ## Flutter Context
 This is a Flutter project. When researching:
-- Use /flutter-expert knowledge: check for state management patterns (Riverpod, Bloc, Provider, etc.), architecture patterns (Clean Architecture, MVVM), and platform integration patterns already in use
+- Use /scout:flutter-expert knowledge: check for state management patterns (Riverpod, Bloc, Provider, etc.), architecture patterns (Clean Architecture, MVVM), and platform integration patterns already in use
 - Identify the Dart version, Flutter SDK version, and key dependencies from pubspec.yaml
 - Note any existing widget composition patterns, theming setup, and navigation approach
-- Use /senior-architect knowledge: analyze existing architecture layers, dependency graph, and module boundaries
+- Use /scout:senior-architect knowledge: analyze existing architecture layers, dependency graph, and module boundaries
 - Check for platform channels, native plugins, and multi-platform targets
 ```
 
@@ -830,8 +830,8 @@ This is a Flutter project. In addition to standard grill categories, probe:
 ```
 ## Flutter Architecture Guidelines
 This is a Flutter project. When writing the PRD:
-- Apply /senior-architect patterns: define clear architecture layers, module boundaries, and dependency flow
-- Apply /flutter-expert best practices: use appropriate state management, widget composition patterns, and platform integration approaches
+- Apply /scout:senior-architect patterns: define clear architecture layers, module boundaries, and dependency flow
+- Apply /scout:flutter-expert best practices: use appropriate state management, widget composition patterns, and platform integration approaches
 - Include architecture diagram showing layer separation (presentation, domain, data)
 - Specify state management approach with rationale
 - Define widget hierarchy and reusable component strategy
@@ -844,14 +844,14 @@ This is a Flutter project. When writing the PRD:
 ```
 ## Flutter Implementation Standards
 This is a Flutter project. When implementing:
-- Follow /flutter-expert conventions:
+- Follow /scout:flutter-expert conventions:
   - Use const constructors wherever possible
   - Apply proper key management for widget identity
   - Use null safety with Dart 3 features (patterns, records, sealed classes)
   - Include comprehensive error handling and loading states
   - Add accessibility annotations (Semantics widgets)
   - Follow Material Design 3 / Cupertino guidelines as appropriate
-- Follow /senior-architect patterns:
+- Follow /scout:senior-architect patterns:
   - Maintain clean architecture layer separation
   - Use repository pattern for data abstraction
   - Apply dependency injection (GetIt, Injectable, or Riverpod)
@@ -890,14 +890,14 @@ When `reactNative: true`, inject the following into agent task prompts:
 ```
 ## React Native Context
 This is a React Native project. When researching:
-- Use /react-native-best-practices knowledge: check for performance patterns (FPS, TTI, bundle size, memory), Hermes engine usage, bridge vs JSI patterns
+- Use /scout:react-native-best-practices knowledge: check for performance patterns (FPS, TTI, bundle size, memory), Hermes engine usage, bridge vs JSI patterns
 - Identify the React Native version, key dependencies, and native module usage from package.json
 - Note existing navigation setup (React Navigation, Expo Router), state management, and styling approach
-- Use /senior-architect knowledge: analyze module boundaries, shared code structure, and platform-specific code organization
+- Use /scout:senior-architect knowledge: analyze module boundaries, shared code structure, and platform-specific code organization
 - Check for native modules, platform channels, and any iOS/Android specific implementations
 - If Expo: check SDK version, managed vs bare workflow, and EAS configuration
-- If Reanimated/Gesture Handler present: note animation patterns and gesture usage via /rn-animations-performance
-- If Skia present: note shader/canvas patterns via /using-react-native-skia
+- If Reanimated/Gesture Handler present: note animation patterns and gesture usage via /scout:rn-animations-performance
+- If Skia present: note shader/canvas patterns via /scout:using-react-native-skia
 ```
 
 **Griller** (Phase 1c) — append to task prompt:
@@ -920,15 +920,15 @@ This is a React Native project. In addition to standard grill categories, probe:
 ```
 ## React Native Architecture Guidelines
 This is a React Native project. When writing the PRD:
-- Apply /senior-architect patterns: define feature module boundaries, shared/platform-specific code split, and dependency flow
-- Apply /react-native-best-practices: address JS thread performance, bridge overhead minimization, and Hermes optimization
+- Apply /scout:senior-architect patterns: define feature module boundaries, shared/platform-specific code split, and dependency flow
+- Apply /scout:react-native-best-practices: address JS thread performance, bridge overhead minimization, and Hermes optimization
 - Specify navigation architecture with screen hierarchy
 - Define state management approach with data flow diagram
 - Address platform-specific UI/UX differences (iOS Human Interface vs Material Design)
 - Include performance requirements (startup time, FPS targets, bundle size limits)
 - Specify animation approach (Reanimated worklets for 60fps+ animations)
 - If Expo: specify SDK constraints, EAS workflow, and managed/bare considerations
-- If Skia involved: define canvas/shader requirements via /using-react-native-skia patterns
+- If Skia involved: define canvas/shader requirements via /scout:using-react-native-skia patterns
 - Specify testing strategy (unit, component, E2E with Detox/Maestro)
 ```
 
@@ -936,23 +936,23 @@ This is a React Native project. When writing the PRD:
 ```
 ## React Native Implementation Standards
 This is a React Native project. When implementing:
-- Follow /react-native-best-practices conventions:
+- Follow /scout:react-native-best-practices conventions:
   - Minimize JS thread work — offload to worklets (Reanimated) or native modules
   - Use FlashList over FlatList for large lists with proper getItemType and estimatedItemSize
   - Memoize components with React.memo, useMemo, useCallback where re-renders are measurable
   - Use Hermes-compatible code patterns (avoid eval, prefer static requires)
   - Avoid bridge overhead — batch native calls, use JSI when available
   - Handle platform differences with Platform.select or .ios.tsx/.android.tsx files
-- Follow /rn-animations-performance for animations:
+- Follow /scout:rn-animations-performance for animations:
   - Run animations on UI thread via Reanimated useAnimatedStyle/useSharedValue
   - Use gesture handler worklets for interactive animations
   - Never drive animations from React state — use shared values
-- Follow /senior-architect patterns:
+- Follow /scout:senior-architect patterns:
   - Feature-based folder structure with clear module boundaries
   - Repository pattern for data layer abstraction
   - Proper error boundaries and loading/error states
 - If Expo: follow Expo conventions (expo-router file-based routing, Expo config plugins, EAS)
-- If Skia present: follow /using-react-native-skia for shader and canvas code
+- If Skia present: follow /scout:using-react-native-skia for shader and canvas code
 - Testing: write component tests with RNTL, snapshot tests for UI, E2E for critical flows
 ```
 
@@ -984,11 +984,11 @@ When `nextjs: true`, inject the following into agent task prompts:
 ```
 ## Next.js Context
 This is a Next.js project. When researching:
-- Use /react-best-practices knowledge: check for rendering patterns (SSR, SSG, ISR, RSC), data fetching approaches, and bundle optimization
+- Use /scout:react-best-practices knowledge: check for rendering patterns (SSR, SSG, ISR, RSC), data fetching approaches, and bundle optimization
 - Identify if using App Router (app/) or Pages Router (pages/) — this fundamentally changes patterns
 - Note the Next.js version, React version, and key dependencies from package.json
 - Check for existing API routes, middleware, server actions, and data fetching patterns
-- Use /senior-architect knowledge: analyze route organization, shared layouts, module boundaries, and backend integration patterns
+- Use /scout:senior-architect knowledge: analyze route organization, shared layouts, module boundaries, and backend integration patterns
 - Check for deployment target (Vercel, self-hosted, Docker) and any edge runtime usage
 - Note styling approach (CSS Modules, Tailwind, styled-components, etc.)
 ```
@@ -1014,8 +1014,8 @@ This is a Next.js project. In addition to standard grill categories, probe:
 ```
 ## Next.js Architecture Guidelines
 This is a Next.js project. When writing the PRD:
-- Apply /senior-architect patterns: define route structure, shared layouts, module boundaries, and API layer design
-- Apply /react-best-practices: specify rendering strategy per route, Server vs Client Component boundaries, and data fetching patterns
+- Apply /scout:senior-architect patterns: define route structure, shared layouts, module boundaries, and API layer design
+- Apply /scout:react-best-practices: specify rendering strategy per route, Server vs Client Component boundaries, and data fetching patterns
 - Define route hierarchy with layouts, loading states, and error boundaries
 - Specify data fetching approach (server actions for mutations, fetch with caching for reads)
 - Address caching strategy (revalidation timing, static vs dynamic routes, CDN behavior)
@@ -1030,7 +1030,7 @@ This is a Next.js project. When writing the PRD:
 ```
 ## Next.js Implementation Standards
 This is a Next.js project. When implementing:
-- Follow /react-best-practices conventions:
+- Follow /scout:react-best-practices conventions:
   - Default to Server Components — only add 'use client' when needed (interactivity, hooks, browser APIs)
   - Use server actions for mutations, fetch with proper caching for data reads
   - Implement loading.tsx and error.tsx for route segments
@@ -1038,7 +1038,7 @@ This is a Next.js project. When implementing:
   - Optimize images with next/image, fonts with next/font
   - Use dynamic imports (next/dynamic) for heavy client components
   - Minimize client-side JavaScript — keep the Client Component boundary as low as possible
-- Follow /senior-architect patterns:
+- Follow /scout:senior-architect patterns:
   - Organize routes with shared layouts and route groups
   - Co-locate components, utils, and types with their routes
   - Use middleware for cross-cutting concerns (auth, redirects, headers)
@@ -1066,10 +1066,10 @@ When `express: true`, inject the following into agent task prompts:
 ```
 ## Express.js Context
 This is an Express.js project. When researching:
-- Use /expressjs-best-practices knowledge: check middleware chain ordering, error handling patterns, and route organization
+- Use /scout:expressjs-best-practices knowledge: check middleware chain ordering, error handling patterns, and route organization
 - Identify Express version, TypeScript usage, and key middleware (helmet, cors, express-validator, passport)
 - Note existing route structure, controller/service separation, and API versioning approach
-- Use /senior-architect knowledge: analyze layered architecture (routes → controllers → services → repositories), module boundaries, and dependency injection
+- Use /scout:senior-architect knowledge: analyze layered architecture (routes → controllers → services → repositories), module boundaries, and dependency injection
 - Check for database integration (Prisma, TypeORM, Knex, Mongoose), ORM patterns, and migration setup
 - Note authentication approach (JWT, sessions, OAuth), validation library, and testing setup (Jest + Supertest)
 ```
@@ -1095,8 +1095,8 @@ This is an Express.js project. In addition to standard grill categories, probe:
 ```
 ## Express Architecture Guidelines
 This is an Express.js project. When writing the PRD:
-- Apply /senior-architect patterns: define layered architecture (routes → controllers → services → repositories), module boundaries, and DI approach
-- Apply /expressjs-best-practices: specify middleware chain, error handling strategy, and security middleware
+- Apply /scout:senior-architect patterns: define layered architecture (routes → controllers → services → repositories), module boundaries, and DI approach
+- Apply /scout:expressjs-best-practices: specify middleware chain, error handling strategy, and security middleware
 - Define API structure with versioning, route grouping, and response format
 - Specify validation strategy with schema library (Zod/Joi) at every route boundary
 - Define authentication/authorization architecture with middleware guards
@@ -1111,7 +1111,7 @@ This is an Express.js project. When writing the PRD:
 ```
 ## Express Implementation Standards
 This is an Express.js project. When implementing:
-- Follow /expressjs-best-practices conventions:
+- Follow /scout:expressjs-best-practices conventions:
   - Wrap async handlers to catch rejected promises — never leave unhandled rejections
   - Use centralized error-handling middleware (4-param function) as the last middleware
   - Create custom AppError class with statusCode and isOperational flag
@@ -1119,7 +1119,7 @@ This is an Express.js project. When implementing:
   - Keep route handlers thin — delegate to service layer for business logic
   - Use express.json({ limit: '10kb' }) to prevent payload abuse
   - Set security headers with helmet, configure CORS with explicit origins
-- Follow /senior-architect patterns:
+- Follow /scout:senior-architect patterns:
   - Layered architecture: routes → controllers → services → repositories
   - Repository pattern for database abstraction
   - Dependency injection for testability
@@ -1147,10 +1147,10 @@ When `fastify: true`, inject the following into agent task prompts:
 ```
 ## Fastify Context
 This is a Fastify project. When researching:
-- Use /fastify-best-practices knowledge: check plugin architecture, schema-based validation/serialization, and hooks lifecycle
+- Use /scout:fastify-best-practices knowledge: check plugin architecture, schema-based validation/serialization, and hooks lifecycle
 - Identify Fastify version, TypeScript type provider usage (Typebox, Zod), and key plugins (@fastify/sensible, @fastify/cors, @fastify/helmet)
 - Note existing plugin structure, encapsulation boundaries, and autoload patterns
-- Use /senior-architect knowledge: analyze plugin composition, shared vs encapsulated decorators, and service layer separation
+- Use /scout:senior-architect knowledge: analyze plugin composition, shared vs encapsulated decorators, and service layer separation
 - Check for database integration (plugin-based with decorators), schema organization, and route registration patterns
 - Note if using @fastify/swagger for API documentation, @fastify/env for config validation
 ```
@@ -1176,8 +1176,8 @@ This is a Fastify project. In addition to standard grill categories, probe:
 ```
 ## Fastify Architecture Guidelines
 This is a Fastify project. When writing the PRD:
-- Apply /senior-architect patterns: define plugin composition tree, encapsulation boundaries, and service layer
-- Apply /fastify-best-practices: specify schema-first validation with Typebox, plugin architecture, and hooks usage
+- Apply /scout:senior-architect patterns: define plugin composition tree, encapsulation boundaries, and service layer
+- Apply /scout:fastify-best-practices: specify schema-first validation with Typebox, plugin architecture, and hooks usage
 - Define plugin hierarchy (shared infrastructure plugins → feature route plugins)
 - Specify schema strategy with Typebox for type-safe request validation AND response serialization
 - Define type provider for end-to-end TypeScript inference from schema to handler
@@ -1193,7 +1193,7 @@ This is a Fastify project. When writing the PRD:
 ```
 ## Fastify Implementation Standards
 This is a Fastify project. When implementing:
-- Follow /fastify-best-practices conventions:
+- Follow /scout:fastify-best-practices conventions:
   - Define JSON Schema (via Typebox) for EVERY route — request validation AND response serialization
   - Use response schemas — they compile to fast serializers (2-3x faster than JSON.stringify)
   - Return values from handlers (`return data`) instead of `reply.send(data)` — it's faster
@@ -1201,7 +1201,7 @@ This is a Fastify project. When implementing:
   - Register database connections as plugins with onClose hooks for cleanup
   - Use req.log for request-scoped logging (child logger with auto request ID)
   - Validate environment config at startup with @fastify/env — fail fast on missing vars
-- Follow /senior-architect patterns:
+- Follow /scout:senior-architect patterns:
   - Plugin-based architecture — one plugin per feature/resource
   - Shared plugins for cross-cutting concerns (database, auth, config)
   - Service layer for business logic — keep route handlers thin
@@ -1241,10 +1241,10 @@ When `react: true`, inject the following into agent task prompts:
 ```
 ## React Context
 This is a client-side React SPA. When researching:
-- Use /react-best-practices knowledge: check for component patterns, rendering optimization, and bundle size management
+- Use /scout:react-best-practices knowledge: check for component patterns, rendering optimization, and bundle size management
 - Identify the React version, build tool (Vite, Webpack, CRA), and TypeScript usage from package.json
 - Note existing routing setup (React Router, TanStack Router), state management (Redux, Zustand, Jotai, React Query), and styling approach
-- Use /senior-architect knowledge: analyze component hierarchy, feature module boundaries, shared utilities, and API integration patterns
+- Use /scout:senior-architect knowledge: analyze component hierarchy, feature module boundaries, shared utilities, and API integration patterns
 - Check for data fetching approach (React Query, SWR, custom hooks), form handling (React Hook Form, Formik), and UI component library (MUI, Chakra, Radix, shadcn)
 - Note testing setup (Jest, Vitest, React Testing Library, Cypress/Playwright)
 ```
@@ -1270,8 +1270,8 @@ This is a client-side React SPA. In addition to standard grill categories, probe
 ```
 ## React Architecture Guidelines
 This is a client-side React SPA. When writing the PRD:
-- Apply /senior-architect patterns: define feature module boundaries, shared component library, and API layer abstraction
-- Apply /react-best-practices: specify component composition patterns, memoization strategy, and bundle optimization approach
+- Apply /scout:senior-architect patterns: define feature module boundaries, shared component library, and API layer abstraction
+- Apply /scout:react-best-practices: specify component composition patterns, memoization strategy, and bundle optimization approach
 - Define routing structure with nested layouts, protected routes, and code-split boundaries
 - Specify state management architecture (separate server state cache from UI state)
 - Define component hierarchy (pages → features → shared components → primitives)
@@ -1286,7 +1286,7 @@ This is a client-side React SPA. When writing the PRD:
 ```
 ## React Implementation Standards
 This is a client-side React SPA. When implementing:
-- Follow /react-best-practices conventions:
+- Follow /scout:react-best-practices conventions:
   - Use React.memo only when re-renders are measurably expensive — don't premature-optimize
   - Lift state up minimally — colocate state with the components that use it
   - Use custom hooks to encapsulate complex logic and side effects
@@ -1294,7 +1294,7 @@ This is a client-side React SPA. When implementing:
   - Keep components focused — extract logic into hooks, presentation into subcomponents
   - Use proper key props for lists (stable IDs, never array index for dynamic lists)
   - Implement error boundaries at feature boundaries
-- Follow /senior-architect patterns:
+- Follow /scout:senior-architect patterns:
   - Feature-based folder structure (feature/components, hooks, api, types)
   - Separate data access layer — typed API client with interceptors
   - Use barrel exports sparingly to avoid circular dependencies
@@ -1312,9 +1312,9 @@ When the task involves interacting with a running app (navigation, screenshots, 
 
 | Task | Tool | Why |
 |------|------|-----|
-| **UI navigation** (tap tabs, buttons, dismiss modals) | `/agent-device` | Accessibility tree refs (`@e85`) are deterministic and reliable |
-| **Scrolling and swiping** | `/agent-device` | Point-based coordinates, works first try |
-| **Visual verification / screenshots** | `/agent-device` | `snapshot` gives element tree + visual state |
+| **UI navigation** (tap tabs, buttons, dismiss modals) | `/scout:agent-device` | Accessibility tree refs (`@e85`) are deterministic and reliable |
+| **Scrolling and swiping** | `/scout:agent-device` | Point-based coordinates, works first try |
+| **Visual verification / screenshots** | `/scout:agent-device` | `snapshot` gives element tree + visual state |
 | **React component inspection** (fiber tree, props, state) | `rn-debugger` MCP | Fiber tree access, component hierarchy |
 | **Console logs, network requests, bundle errors** | `rn-debugger` MCP | Runtime debugging capabilities |
 | **Execute JS in app runtime** | `rn-debugger` MCP | `execute_in_app` for runtime evaluation |
@@ -1327,9 +1327,9 @@ Direct comparison (2026-03-26) showed:
 
 ### Usage in Scout phases
 
-- **Phase 1 (GRILL)**: Use `/agent-device` if investigating a visual bug — `snapshot` to read current UI state, `screenshot` for visual proof
-- **Phase 4 (EXECUTE)**: Builders use `/agent-device` for post-implementation visual verification
-- **Phase 4b (Design Verification)**: Inspector uses `/agent-device` for screenshot capture and UI comparison
+- **Phase 1 (GRILL)**: Use `/scout:agent-device` if investigating a visual bug — `snapshot` to read current UI state, `screenshot` for visual proof
+- **Phase 4 (EXECUTE)**: Builders use `/scout:agent-device` for post-implementation visual verification
+- **Phase 4b (Design Verification)**: Inspector uses `/scout:agent-device` for screenshot capture and UI comparison
 - **Debugging failures**: Use `rn-debugger` for console logs, network inspection, and React component state when Builders hit issues
 
 ### agent-device quick reference
