@@ -33,7 +33,7 @@ The result is a set of verified, ready-to-merge pull requests.
 
 ```bash
 # Clone directly into your Claude Code skills directory
-git clone https://github.com/iykazrji/scout-skills.git ~/.claude/skills/scout
+git clone https://github.com/iykazrji/scout.git ~/.claude/skills/scout
 ```
 
 That's it. `/scout` is immediately available.
