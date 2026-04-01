@@ -29,25 +29,31 @@ The result is a set of verified, ready-to-merge pull requests.
 
 ## Installation
 
-### Quick install (symlinks)
+### Quick install (symlinks — recommended)
 
 ```bash
 git clone https://github.com/iykazrji/scout-skills.git
 cd scout-skills
 
-# Symlink each skill into Claude Code
-ln -s "$(pwd)/skills/scout" ~/.claude/skills/scout
-ln -s "$(pwd)/skills/reconn" ~/.claude/skills/reconn
-ln -s "$(pwd)/skills/execute-issues" ~/.claude/skills/execute-issues
+# Symlink all skills into Claude Code
+for skill in skills/*/; do
+  name=$(basename "$skill")
+  ln -sf "$(pwd)/$skill" ~/.claude/skills/$name
+done
 ```
+
+This installs all 7 skills at once. Symlinks mean `git pull` updates everything automatically.
 
 ### Manual install (copy)
 
 ```bash
 git clone https://github.com/iykazrji/scout-skills.git
-cp -r scout-skills/skills/scout ~/.claude/skills/scout
-cp -r scout-skills/skills/reconn ~/.claude/skills/reconn
-cp -r scout-skills/skills/execute-issues ~/.claude/skills/execute-issues
+
+# Copy all skills into Claude Code
+for skill in scout-skills/skills/*/; do
+  name=$(basename "$skill")
+  cp -r "$skill" ~/.claude/skills/$name
+done
 ```
 
 ### Verify installation
@@ -127,22 +133,17 @@ In `yolo` mode, Bursar auto-proceeds unless the estimate exceeds $10. In `auto` 
 
 ## Skills Included
 
-| Skill | Command | Description |
-|-------|---------|-------------|
-| **Scout** | `/scout` | End-to-end orchestrator — grill, PRD, cost estimate, issues, execute |
-| **Reconn** | `/reconn` | Deep research agent — codebase, web, notes |
-| **Execute Issues** | `/execute-issues` | Implement GitHub issues with verified PRs |
+Everything Scout needs is bundled in this repo — no external dependencies.
 
-## Dependencies
-
-These skills reference other Claude Code skills that should be installed separately:
-
-| Skill | Used By | Purpose |
-|-------|---------|---------|
-| `/grill-me` | Griller agent | Technical interrogation protocol |
-| `/write-a-prd` | Architect agent | PRD writing and GitHub issue creation |
-| `/prd-to-issues` | Slicer agent | Vertical-slice issue breakdown |
-| `/ui-designer` | Designer agent (optional) | UI design specs for UI-heavy PRDs |
+| Skill | Command | Used By | Description |
+|-------|---------|---------|-------------|
+| **Scout** | `/scout` | — | End-to-end orchestrator — grill, PRD, cost estimate, issues, execute |
+| **Reconn** | `/reconn` | Scout (research phases) | Deep research agent — codebase, web, notes |
+| **Execute Issues** | `/execute-issues` | Scout (Phase 4) | Implement GitHub issues with verified PRs |
+| **Grill Me** | `/grill-me` | Griller agent | Technical interrogation protocol |
+| **Write a PRD** | `/write-a-prd` | Architect agent | PRD writing and GitHub issue creation |
+| **PRD to Issues** | `/prd-to-issues` | Slicer agent | Vertical-slice issue breakdown |
+| **UI Designer** | `/ui-designer` | Designer agent | UI design specs and mockups for UI-heavy PRDs |
 
 ## Docs
 

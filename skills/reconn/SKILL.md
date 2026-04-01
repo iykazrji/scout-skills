@@ -72,9 +72,30 @@ Parse the topic into specific research questions. A topic like "how does auth wo
 - How are tokens validated?
 - What are the auth flows?
 
+### 1b. Library doc lookup (MANDATORY when a library is involved)
+
+If the topic involves a specific library, framework, or tool — fetch official documentation BEFORE searching the codebase or guessing at solutions.
+
+**Trigger:** Error messages mentioning a package, config questions about a tool, "how do I use X", migration issues, unexpected behavior from a dependency.
+
+**Steps:**
+1. Identify the library/libraries involved (from error message, topic, or package.json)
+2. Fetch the official docs page for the specific topic (installation, configuration, monorepo setup, migration guide, etc.)
+3. Extract the recommended approach — what does the library author say to do?
+4. Only THEN check the codebase to see if the project follows the recommendation
+
+**Why this exists:** In a debugging session, hours were wasted guessing at Metro/Expo fixes (custom entry files, config overrides, package manager migration) when the actual fix was documented in the official guides. The official docs should be the FIRST source of truth for library-specific problems, not the last resort.
+
+**Common doc URLs to check:**
+- Expo: `docs.expo.dev/guides/monorepos/`, `docs.expo.dev/router/installation/`
+- React Native: `reactnative.dev/docs/`
+- Skia: `shopify.github.io/react-native-skia/docs/getting-started/`
+- Victory Native: `commerce.nearform.com/open-source/victory-native/`
+- Any library: check the `homepage` field in its `package.json` or the repo README
+
 ### 2. Search all layers
 
-Run searches across all 3 layers. Prioritize codebase for implementation questions, web for API/library questions, notes for decision history.
+Run searches across all 3 layers. Prioritize **official docs first** for library questions, codebase for implementation questions, notes for decision history.
 
 ### 3. Synthesize findings
 
