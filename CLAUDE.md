@@ -2,9 +2,9 @@
 
 ## Repo Location
 
-Canonical location: `/Users/iyk/Developer/scout-skills/`
+Canonical location: `~/.claude/skills/scout-skills/`
 
-All skills are symlinked into `~/.claude/skills/` — edits through the symlinks write directly to this repo.
+All skills are symlinked from `~/.claude/skills/<name>` into this repo — edits through the symlinks write directly here.
 
 ## Adding a New Skill
 
@@ -24,7 +24,7 @@ Edit via the symlinks at `~/.claude/skills/<name>/` or directly in the repo at `
 
 After editing, commit from the repo:
 ```bash
-cd /Users/iyk/Developer/scout-skills
+cd ~/.claude/skills/scout-skills
 git add -A && git commit -m "description" && git push origin main
 ```
 
