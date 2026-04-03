@@ -880,6 +880,7 @@ Detect additional RN capabilities by checking dependencies:
 grep -q '"react-native-reanimated"' package.json 2>/dev/null  # animations
 grep -q '"@shopify/react-native-skia"' package.json 2>/dev/null  # Skia
 grep -q '"react-native-gesture-handler"' package.json 2>/dev/null  # gestures
+grep -q '"react-native-screen-transitions"' package.json 2>/dev/null  # screen transitions (zoom, shared element illusions)
 ```
 
 ### React Native-Aware Agent Prompts
@@ -898,6 +899,7 @@ This is a React Native project. When researching:
 - If Expo: check SDK version, managed vs bare workflow, and EAS configuration
 - If Reanimated/Gesture Handler present: note animation patterns and gesture usage via /scout:rn-animations-performance
 - If Skia present: note shader/canvas patterns via /scout:using-react-native-skia
+- If screen-transitions present: note transition patterns, zoom configs, boundary triggers, and snap points via /scout:using-react-native-screen-transitions
 ```
 
 **Griller** (Phase 1c) — append to task prompt:
@@ -908,6 +910,7 @@ This is a React Native project. In addition to standard grill categories, probe:
 - State management approach (Redux, Zustand, Jotai, React Query, context)
 - Performance targets (JS thread FPS, startup time, bundle size budget)
 - Animation strategy (Reanimated worklets vs Animated API vs CSS transitions)
+- Screen transition approach (react-native-screen-transitions zoom/bounds vs shared elements vs native stack defaults)
 - List rendering approach (FlashList vs FlatList vs Skia-based)
 - Native module needs (Turbo Modules, Fabric components, Expo Modules API)
 - Over-the-air updates strategy (EAS Update, CodePush)
@@ -929,6 +932,7 @@ This is a React Native project. When writing the PRD:
 - Specify animation approach (Reanimated worklets for 60fps+ animations)
 - If Expo: specify SDK constraints, EAS workflow, and managed/bare considerations
 - If Skia involved: define canvas/shader requirements via /scout:using-react-native-skia patterns
+- If screen-transitions present: define transition architecture (zoom vs presets vs custom), boundary trigger strategy, gesture dismiss behavior, and backdrop approach via /scout:using-react-native-screen-transitions
 - Specify testing strategy (unit, component, E2E with Detox/Maestro)
 ```
 
@@ -953,6 +957,7 @@ This is a React Native project. When implementing:
   - Proper error boundaries and loading/error states
 - If Expo: follow Expo conventions (expo-router file-based routing, Expo config plugins, EAS)
 - If Skia present: follow /scout:using-react-native-skia for shader and canvas code
+- If screen-transitions present: follow /scout:using-react-native-screen-transitions for all screen transition code — use BlankStack navigator, bounds().navigation.zoom() for hero animations, Transition.Boundary.Trigger for source elements, useScreenGesture/useScreenAnimation for dismiss thresholds, and Transition.ScrollView for gesture-aware scrolling. Prefer active element animation (zoom) over shared element libraries.
 - Testing: write component tests with RNTL, snapshot tests for UI, E2E for critical flows
 ```
 
